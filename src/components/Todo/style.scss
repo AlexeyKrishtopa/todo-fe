@@ -1,0 +1,66 @@
+.todos {
+  &__todo {
+    width: 430px;
+    position: relative;
+    background: white;
+    color: #4d4d4d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 16px;
+    border: none;
+    border-bottom: 1px solid rgb(192, 192, 192);
+    &:hover {
+      .todos__todo-remove {
+       display: inline-block;
+      }
+    }
+  }
+  &__todo-remove {
+    display: none;
+    border: none;
+    background: transparent;
+  }
+  &__todo-icon {
+    stroke-width: 30;
+    width: 12px;
+    height: 12px;
+    fill: rgba(218, 23, 23, 0.274);
+    transition: fill ease-in 0.1s;
+    &:hover {
+      fill: rgba(218, 23, 23, 0.479);
+    }
+  }
+  &__todo-description {
+    font-family: 'Open Sans', sans-serif;
+    display: block;
+    border: none;
+    outline: none;
+    padding: 12px 24px;
+    font-size: 24px;
+    flex: 1 1 100%;
+    width: 373px;
+    pointer-events: none;
+    // position: relative;
+  }
+  &__temp-description-input {
+    position: absolute;
+    top: 0;
+    right: 0px;
+    width: calc(100%);
+    color: #4d4d4d;
+    padding-left: 12px;
+    height: 100%;
+    border: 1px solid #4d4d4d1e;
+    font-size: 24px;
+    font-family: 'Open Sans', sans-serif;
+    outline: none;
+    background: #fff;
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 5%) inset, 0 25px 50px 0 rgb(0 0 0 / 5%) inset;
+  }
+}
+
+.text-crossed {
+  text-decoration: line-through;
+  color: #d9d9d9;
+}
