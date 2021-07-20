@@ -12,6 +12,7 @@ export default class Todos {
   constructor() {
     this.todos = []
     this.state = TODOS_STATES.ALL
+    this._todosCount = 0
   }
 
   _appendTodo(todo) {
@@ -87,12 +88,16 @@ export default class Todos {
         })
         this._appendTodo(newTodo)
         todosListElement.append(newTodo.render())
+        this._todosCount++
+        emiter.emit({ eventName: 'setSubline', args: [event, true] })
+        console.log(this._todosCount)
       })
 
       emiter.emit({ eventName: 'showTodosOptions', args: [event] })
       this._updateTodosCount()
       emiter.emit({ eventName: 'dragAndDrop', args: [this] })
 
+      
       // localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
     })
     emiter.subscribe('newTodo', (event) => {
@@ -129,7 +134,9 @@ export default class Todos {
       this._updateTodosCount()
 
       emiter.emit({ eventName: 'dragAndDrop', args: [this] })
-
+      this._todosCount++
+      console.log(this._todosCount)
+      emiter.emit({ eventName: 'setSubline', args: [event, true] })
       localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
     })
     emiter.subscribe('removeTodo', (event) => {
@@ -144,7 +151,10 @@ export default class Todos {
       this._updateTodosCount()
 
       emiter.emit({ eventName: 'dragAndDrop', args: [this] })
+      this._todosCount--
+      console.log(this._todosCount)
 
+      emiter.emit({ eventName: 'setSubline', args: [event, false] })
       localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
     })
     emiter.subscribe('checkTodo', (event) => {
@@ -366,6 +376,17 @@ export default class Todos {
     emiter.subscribe('dragAndDrop', (todos) => {
       dragAndDrop(todos)
     })
+    emiter.subscribe('setSubline', (event, isAppend) => {
+      if (isAppend) {
+        if (this._todosCount <= 3) {
+          const sublineElement = document.createElement('li')
+          sublineElement.classList.add('todos__subline')
+          todosSublinesElement.append(sublineElement)
+        }
+      } else if(this._todosCount < 3) {
+        todosSublinesElement.lastElementChild?.remove()
+      }
+    })
 
     const inputElement = new Input({
       className: 'input',
@@ -413,6 +434,10 @@ export default class Todos {
     const checkAllButtonElement = document.createElement('a')
     checkAllButtonElement.innerHTML = checkAllSVG
     checkAllButtonElement.classList.add('todos__check-all')
+
+    const todosSublinesElement = document.createElement('ul')
+    todosSublinesElement.classList.add('todos__sublines')
+
     checkAllButtonElement.addEventListener('click', (event) => {
       emiter.emit({ eventName: 'toggleCheckedAllTodos', args: [event] })
     })
@@ -461,6 +486,7 @@ export default class Todos {
     todosFooterElement.append(clearCompletedButton)
 
     todosBodyElement.append(todosFooterElement)
+    todosBodyElement.append(todosSublinesElement)
 
     todosCreateFormElement.append(checkAllButtonElement)
     todosCreateFormElement.append(inputElement)
