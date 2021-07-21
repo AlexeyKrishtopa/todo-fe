@@ -8,8 +8,7 @@ export default class Todo extends Component {
     super(options)
     this.id = options.id ?? null
     this.description = options.description ?? ''
-    this.isChecked = options.isChecked ?? false
-    this.isCrossed = options.isCrossed ?? false
+    this.completed = options.completed ?? false
 
     this.onClick = options.onClick ?? null
     this.onRemove = options.onRemove ?? null
@@ -24,13 +23,13 @@ export default class Todo extends Component {
     const todoCheckboxElement = new Checkbox({
       className: 'todo-checkbox',
       onChecked: this.onChecked,
-      isChecked: this.isChecked,
+      isChecked: this.completed,
     }).render()
 
     const todoDescriptionElement = document.createElement('span')
     todoDescriptionElement.classList.add(`${this.className}-description`)
     todoDescriptionElement.innerText = this.description
-    if (this.isCrossed) {
+    if (this.completed) {
       todoElement.classList.add('text-crossed')
     }
 

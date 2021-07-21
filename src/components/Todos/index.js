@@ -21,7 +21,7 @@ export default class Todos {
   }
 
   _removeTodo(todoId) {
-    this.todos = this.todos.filter((todo) => +todo.id !== +todoId)
+    this.todos = this.todos.filter((todo) => todo._id !== todoId)
   }
 
   _toggleCrossedTodo(todoId) {
@@ -115,8 +115,7 @@ export default class Todos {
       const newTodoComponent = new Todo({
         id: newTodo._id,
         description: newTodo.description,
-        isChecked: newTodo.completed,
-        isCrossed: newTodo.completed,
+        completed: newTodo.completed,
         className: 'todo',
         onRemove: (event) => {
           emiter.emit({ eventName: 'removeTodo', args: [event] })
@@ -147,6 +146,7 @@ export default class Todos {
       console.log(this._todosCount)
       emiter.emit({ eventName: 'setSubline', args: [event, true] })
       localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
+      console.log(this.todos)
     })
     emiter.subscribe('removeTodo', async (event) => {
       event.preventDefault()
@@ -158,9 +158,11 @@ export default class Todos {
       const res = await callApi(`/todos/${id}`, {
         method: 'DELETE',
       })
-      const newTodo = res.payload.dto
+      const deletedTodo = res.payload.dto
 
-      this._removeTodo(event.target.closest('.todos__todo').id)
+      console.log(deletedTodo._id)
+
+      this._removeTodo(deletedTodo._id)
       event.target.closest('.todos__todo').remove()
 
       if (this.todos.length === 0) {
@@ -169,18 +171,25 @@ export default class Todos {
       this._updateTodosCount()
 
       emiter.emit({ eventName: 'dragAndDrop', args: [this] })
+
       this._todosCount--
       console.log(this._todosCount)
 
       emiter.emit({ eventName: 'setSubline', args: [event, false] })
       localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
+
+      console.log(this.todos)
     })
-    emiter.subscribe('checkTodo', (event) => {
-      const todoElementId = +event.target.closest('.todos__todo').id
+    emiter.subscribe('checkTodo', async (event) => {
+      const todoElementId = event.target.closest('.todos__todo').id
       const todoElement = event.target.closest('.todos__todo')
+
+      let updatedTodo = null
+
       this.todos.forEach((todo) => {
-        if (+todo.id === +todoElementId) {
-          todo.isChecked = !todo.isChecked
+        if (todo._id === todoElementId) {
+          todo.completed = !todo.completed
+          updatedTodo = todo
           this._toggleCrossedTodo(todoElement.id)
           todoElement.classList.toggle('text-crossed')
           if (this.state === TODOS_STATES.ACTIVE) {
@@ -191,6 +200,15 @@ export default class Todos {
           }
         }
       })
+
+      await callApi(`/todos/${updatedTodo._id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          description: updatedTodo.description,
+          completed: updatedTodo.completed,
+        }),
+      })
+
       this._updateTodosCount()
 
       CHEACK_ALL_STATE.isActive = this._isCheckedAll()
@@ -250,32 +268,60 @@ export default class Todos {
         event.target
           .querySelector('.todos__todo-checkbox')
           .classList.add('hidden')
+
         currentTodoDescriptionElement.append(tempTodoInputElement)
         tempTodoInputElement.focus()
-        tempTodoInputElement.addEventListener('keypress', (event) => {
+
+        tempTodoInputElement.addEventListener('keypress', async (event) => {
           if (event.key === 'Enter') {
-            this.todos.forEach((todo) => {
-              if (+todo.id === +currentTodoElement.id) {
+            let updatedTodo = null
+            await this.todos.forEach((todo) => {
+              if (todo._id === currentTodoElement.id) {
                 const newDescription = tempTodoInputElement.value
                 todo.description = newDescription
                 currentTodoDescriptionElement.innerText = newDescription
+                updatedTodo = todo
               }
             })
+
+            console.log(updatedTodo)
+
+            await callApi(`/todos/${updatedTodo._id}`, {
+              method: 'PUT',
+              body: JSON.stringify({
+                description: updatedTodo.description,
+                completed: updatedTodo.completed,
+              }),
+            })
+
             tempTodoInputElement.remove()
           }
         })
-        tempTodoInputElement.addEventListener('blur', () => {
-          this.todos.forEach((todo) => {
-            if (+todo.id === +currentTodoElement.id) {
+        tempTodoInputElement.addEventListener('blur', async () => {
+          let updatedTodo = null
+
+          await this.todos.forEach((todo) => {
+            if (todo._id === currentTodoElement.id) {
               const newDescription = tempTodoInputElement.value
               todo.description = newDescription
               currentTodoDescriptionElement.innerText = newDescription
+              updatedTodo = todo
             }
           })
 
           event.target
             .querySelector('.todos__todo-checkbox')
             .classList.remove('hidden')
+
+          console.log(updatedTodo)
+
+          await callApi(`/todos/${updatedTodo._id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              description: updatedTodo.description,
+              completed: updatedTodo.completed,
+            }),
+          })
 
           tempTodoInputElement.remove()
         })
