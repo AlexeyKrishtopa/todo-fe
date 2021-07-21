@@ -18,7 +18,8 @@
 
   &__body {
     box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%), 0 25px 50px 0 rgb(0 0 0 / 10%);
-    min-width: 430px
+    min-width: 430px;
+    position: relative;
   }
 
   &__list {
@@ -58,6 +59,7 @@
     padding: 12px 0px;
     display: flex;
     justify-content: space-around;
+    border-bottom: 1px solid silver
   }
 
   &__options-container {
@@ -93,8 +95,27 @@
   }
 }
 
+.todos__sublines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 430px;
+}
+
 .todos__subline {
-  width: 100%;
-  padding: 5px;
-  border: 1px solid black;
+  padding: 1.75px;
+  border: 1px solid silver;
+  background: rgb(240, 240, 240);
+  z-index: 10;
+  border-top: none;
+  margin: 0 auto;
+  &:nth-child(1) {
+    width: 95%;
+  }
+  &:nth-child(2) {
+    width: 90%;
+  }
+  &:nth-child(3) {
+    width: 85%;
+  }
 }
