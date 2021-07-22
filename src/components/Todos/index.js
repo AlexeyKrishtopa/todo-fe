@@ -45,7 +45,7 @@ export default class Todos {
 
   _isCheckedAll() {
     for (const todo of this.todos) {
-      if (!todo.isChecked) {
+      if (!todo.completed) {
         return false
       }
     }
@@ -58,7 +58,7 @@ export default class Todos {
 
     const todoElements = document.querySelectorAll('.todos__todo')
     todoElements.forEach((todoElement) => {
-      tempTodos.push(this.todos.find((todo) => +todo.id === +todoElement.id))
+      tempTodos.push(this.todos.find((todo) => todo._id === todoElement.id))
     })
 
     this.todos = tempTodos
@@ -103,14 +103,25 @@ export default class Todos {
     emiter.subscribe('newTodo', async (event) => {
       event.preventDefault()
 
+      let newSort = null
+      if (this.todos.length) {
+        const prevTodoSort = this.todos[this.todos.length - 1].sort
+        newSort = prevTodoSort + 1
+      } else {
+        newSort = 1
+      }
+
       const res = await callApi('/todos', {
         method: 'POST',
         body: JSON.stringify({
           description: inputElement.value,
           completed: false,
+          sort: newSort,
         }),
       })
       const newTodo = res.payload.dto
+
+      console.log(newTodo)
 
       const newTodoComponent = new Todo({
         id: newTodo._id,
@@ -206,6 +217,7 @@ export default class Todos {
         body: JSON.stringify({
           description: updatedTodo.description,
           completed: updatedTodo.completed,
+          sort: updatedTodo.sort,
         }),
       })
 
@@ -291,6 +303,7 @@ export default class Todos {
               body: JSON.stringify({
                 description: updatedTodo.description,
                 completed: updatedTodo.completed,
+                sort: updatedTodo.sort,
               }),
             })
 
@@ -320,6 +333,7 @@ export default class Todos {
             body: JSON.stringify({
               description: updatedTodo.description,
               completed: updatedTodo.completed,
+              sort: updatedTodo.sort,
             }),
           })
 
@@ -330,14 +344,23 @@ export default class Todos {
         ///
       }
     })
-    emiter.subscribe('clearComplitedTodos', (event) => {
+    emiter.subscribe('clearComplitedTodos', async (event) => {
       event.preventDefault()
 
+      let deletedTodos = []
+
       this.todos.forEach((todo) => {
-        if (todo.isChecked) {
-          const todoElement = document.getElementById(todo.id)
+        if (todo.completed) {
+          const todoElement = document.getElementById(todo._id)
+          deletedTodos.push(todo)
           todoElement.remove()
         }
+      })
+
+      deletedTodos.forEach(async (deletedTodo) => {
+        await callApi(`/todos/${deletedTodo._id}`, {
+          method: 'DELETE',
+        })
       })
 
       this._clearComplited()
@@ -386,16 +409,24 @@ export default class Todos {
       event.preventDefault()
 
       if (this._isCheckedAll()) {
-        this.todos.forEach((todo) => {
-          todo.isChecked = !todo.isChecked
-          todo.isCrossed = !todo.isCrossed
+        this.todos.forEach(async (todo) => {
+          todo.completed = !todo.completed
           const todoCheckboxElement = document
-            .getElementById(todo.id)
+            .getElementById(todo._id)
             .querySelector('.todos__todo-checkbox')
-          const todoElement = document.getElementById(todo.id)
+          const todoElement = document.getElementById(todo._id)
           todoCheckboxElement.checked = !todoCheckboxElement.checked
           todoElement.classList.toggle('text-crossed')
+
+          await callApi(`/todos/${todo._id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              description: todo.description,
+              completed: todo.completed,
+            }),
+          })
         })
+
         this._updateTodosCount()
 
         CHEACK_ALL_STATE.isActive = !CHEACK_ALL_STATE.isActive
@@ -406,16 +437,24 @@ export default class Todos {
 
         localStorage.setItem('checkAllState', JSON.stringify(CHEACK_ALL_STATE))
       } else {
-        this.todos.forEach((todo) => {
-          todo.isChecked = true
-          todo.isCrossed = true
+        this.todos.forEach(async (todo) => {
+          todo.completed = true
           const todoCheckboxElement = document
-            .getElementById(todo.id)
+            .getElementById(todo._id)
             .querySelector('.todos__todo-checkbox')
-          const todoElement = document.getElementById(todo.id)
+          const todoElement = document.getElementById(todo._id)
           todoCheckboxElement.checked = true
           todoElement.classList.add('text-crossed')
+
+          await callApi(`/todos/${todo._id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              description: todo.description,
+              completed: todo.completed,
+            }),
+          })
         })
+
         this._updateTodosCount()
 
         CHEACK_ALL_STATE.isActive = true
