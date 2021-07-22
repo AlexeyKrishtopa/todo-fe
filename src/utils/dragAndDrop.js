@@ -52,30 +52,38 @@ export const dragAndDrop = (todosComponent) => {
 
     //logic of todosComponent.todos sort
 
-    todosElement.insertBefore(activeElement, nextElement)
+    await todosElement.insertBefore(activeElement, nextElement)
+
+    // todosComponent._updateTodos()
+    console.log(todosComponent.todos)
 
     if (activeElement.nextElementSibling) {
-      const previousTodoid = activeElement.previousElementSibling?.id || 0
-      const activeTodoid = activeElement.id
-      const nextTodoid = activeElement.nextElementSibling.id
+      const previousTodoId = activeElement.previousElementSibling?.id
+      const activeTodoId = activeElement.id
+      const nextTodoId = activeElement.nextElementSibling.id
 
       let nextTodo = null
       let activeTodo = null
       let prevTodo = null
 
       todosComponent.todos.forEach((todo) => {
-        if (todo._id === previousTodoid) {
+        if (todo._id === previousTodoId) {
           prevTodo = todo
         }
-        if (todo._id === activeTodoid) {
+        if (todo._id === activeTodoId) {
           activeTodo = todo
         }
-        if (todo._id === nextTodoid) {
+        if (todo._id === nextTodoId) {
           nextTodo = todo
         }
       })
 
-      activeTodo.sort = (+prevTodo?.sort || 0 + +nextTodo.sort) / 2
+      let prevTodoSort = null
+
+      !prevTodo?.sort ? (prevTodoSort = 0) : (prevTodoSort = prevTodo.sort)
+
+      activeTodo.sort = (+prevTodoSort + +nextTodo.sort) / 2
+      console.log(activeTodo)
 
       await callApi(`/todos/${activeTodo._id}`, {
         method: 'PUT',
@@ -85,24 +93,24 @@ export const dragAndDrop = (todosComponent) => {
           sort: activeTodo.sort,
         }),
       })
-
-      console.log(todosComponent.todos)
     } else {
       let activeTodo = null
       let prevTodo = null
-      const activeTodoid = activeElement.id
-      const previousTodoid = activeElement.previousElementSibling.id
+      const activeTodoId = activeElement.id
+      const previousTodoId = activeElement.previousElementSibling.id
       todosComponent.todos.forEach((todo) => {
-        if (todo._id === activeTodoid) {
+        if (todo._id === activeTodoId) {
           activeTodo = todo
         }
-        if (todo._id === previousTodoid) {
+        if (todo._id === previousTodoId) {
           prevTodo = todo
         }
       })
 
       activeTodo.sort = prevTodo.sort + 1
 
+      console.log(activeTodo)
+
       await callApi(`/todos/${activeTodo._id}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -111,11 +119,9 @@ export const dragAndDrop = (todosComponent) => {
           sort: activeTodo.sort,
         }),
       })
-
-      console.log(todosComponent.todos)
     }
 
-    todosComponent._updateTodos()
+    console.log(todosComponent.todos)
     localStorage.setItem('todos', JSON.stringify(todosComponent.todos, null, 2))
   }
 

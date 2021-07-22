@@ -13,7 +13,6 @@ export default class Todos {
   constructor() {
     this.todos = []
     this.state = TODOS_STATES.ALL
-    this._todosCount = 0
   }
 
   _appendTodo(todo) {
@@ -72,10 +71,9 @@ export default class Todos {
       event.preventDefault()
       oldTodos.forEach((oldTodo) => {
         const newTodo = new Todo({
-          id: oldTodo.id,
+          id: oldTodo._id,
           description: oldTodo.description,
-          isChecked: oldTodo.isChecked,
-          isCrossed: oldTodo.isCrossed,
+          completed: oldTodo.completed,
           className: 'todo',
           onRemove: (event) => {
             emiter.emit({ eventName: 'removeTodo', args: [event] })
@@ -87,11 +85,9 @@ export default class Todos {
             emiter.emit({ eventName: 'clickOnTodo', args: [event] })
           },
         })
-        this._appendTodo(newTodo)
+        this._appendTodo(oldTodo)
         todosListElement.append(newTodo.render())
-        this._todosCount++
         emiter.emit({ eventName: 'setSubline', args: [event, true] })
-        console.log(this._todosCount)
       })
 
       emiter.emit({ eventName: 'showTodosOptions', args: [event] })
@@ -99,6 +95,30 @@ export default class Todos {
       emiter.emit({ eventName: 'dragAndDrop', args: [this] })
 
       // localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
+    })
+    emiter.subscribe('drowTodos', (event, todos) => {
+      todosListElement.innerHTML = ''
+      todos.forEach((todo) => {
+        const newTodoComponent = new Todo({
+          id: todo._id,
+          description: todo.description,
+          completed: todo.completed,
+          className: 'todo',
+          onRemove: (event) => {
+            emiter.emit({ eventName: 'removeTodo', args: [event] })
+          },
+          onChecked: (event) => {
+            emiter.emit({ eventName: 'checkTodo', args: [event] })
+          },
+          onClick: (event) => {
+            emiter.emit({ eventName: 'clickOnTodo', args: [event] })
+          },
+        })
+        const newTodoElement = newTodoComponent.render()
+        todosListElement.append(newTodoElement)
+      })
+
+      emiter.emit({ eventName: 'dragAndDrop', args: [this] })
     })
     emiter.subscribe('newTodo', async (event) => {
       event.preventDefault()
@@ -153,11 +173,8 @@ export default class Todos {
       this._updateTodosCount()
 
       emiter.emit({ eventName: 'dragAndDrop', args: [this] })
-      this._todosCount++
-      console.log(this._todosCount)
       emiter.emit({ eventName: 'setSubline', args: [event, true] })
       localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
-      console.log(this.todos)
     })
     emiter.subscribe('removeTodo', async (event) => {
       event.preventDefault()
@@ -176,20 +193,14 @@ export default class Todos {
       this._removeTodo(deletedTodo._id)
       event.target.closest('.todos__todo').remove()
 
-      if (this.todos.length === 0) {
-        emiter.emit({ eventName: 'hideTodosOptions', args: [] })
-      }
+      emiter.emit({ eventName: 'setTodosOptions', args: [] })
+
       this._updateTodosCount()
 
       emiter.emit({ eventName: 'dragAndDrop', args: [this] })
 
-      this._todosCount--
-      console.log(this._todosCount)
-
       emiter.emit({ eventName: 'setSubline', args: [event, false] })
       localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
-
-      console.log(this.todos)
     })
     emiter.subscribe('checkTodo', async (event) => {
       const todoElementId = event.target.closest('.todos__todo').id
@@ -365,17 +376,21 @@ export default class Todos {
 
       this._clearComplited()
       this._updateTodosCount()
+      emiter.emit({ eventName: 'setTodosOptions', args: [] })
 
       localStorage.setItem('todos', JSON.stringify(this.todos, null, 2))
     })
     emiter.subscribe('showActiveTodos', (event) => {
       event.preventDefault()
 
-      this.todos.forEach((todo) => {
-        const todoElement = document.getElementById(todo.id)
-        !todo.isChecked
-          ? todoElement.classList.remove('hidden')
-          : todoElement.classList.add('hidden')
+      emiter.emit({
+        eventName: 'drowTodos',
+        args: [
+          event,
+          this.todos
+            .filter((todo) => !todo.completed)
+            .sort((a, b) => a.sort - b.sort),
+        ],
       })
 
       this.state = TODOS_STATES.ACTIVE
@@ -384,11 +399,14 @@ export default class Todos {
     emiter.subscribe('showComplitedTodos', (event) => {
       event.preventDefault()
 
-      this.todos.forEach((todo) => {
-        const todoElement = document.getElementById(todo.id)
-        !todo.isChecked
-          ? todoElement.classList.add('hidden')
-          : todoElement.classList.remove('hidden')
+      emiter.emit({
+        eventName: 'drowTodos',
+        args: [
+          event,
+          this.todos
+            .filter((todo) => todo.completed)
+            .sort((a, b) => a.sort - b.sort),
+        ],
       })
 
       this.state = TODOS_STATES.COMPLETED
@@ -397,9 +415,9 @@ export default class Todos {
     emiter.subscribe('showAllTodos', (event) => {
       event.preventDefault()
 
-      this.todos.forEach((todo) => {
-        const todoElement = document.getElementById(todo.id)
-        todoElement.classList.remove('hidden')
+      emiter.emit({
+        eventName: 'drowTodos',
+        args: [event, this.todos.sort((a, b) => a.sort - b.sort)],
       })
 
       this.state = TODOS_STATES.ALL
@@ -476,6 +494,11 @@ export default class Todos {
       checkAllButtonElement.classList.remove('hidden')
       todosFooterElement.classList.remove('hidden')
     })
+    emiter.subscribe('setTodosOptions', () => {
+      this.todos.length === 0
+        ? emiter.emit({ eventName: 'hideTodosOptions', args: [] })
+        : emiter.emit({ eventName: 'showTodosOptions', args: [] })
+    })
     emiter.subscribe('dragAndDrop', (todos) => {
       dragAndDrop(todos)
     })
@@ -549,7 +572,8 @@ export default class Todos {
       label: 'All',
       className: 'footer-button',
       isHighlight: true,
-      isHighlightDefault: true,
+      isHighlightDefault: false,
+      href: '#',
       onClick: (event) => {
         emiter.emit({ eventName: 'showAllTodos', args: [event] })
       },
@@ -559,6 +583,7 @@ export default class Todos {
       className: 'footer-button',
       isHighlight: true,
       isHighlightDefault: false,
+      href: '#/active',
       onClick: (event) => {
         emiter.emit({ eventName: 'showActiveTodos', args: [event] })
       },
@@ -568,6 +593,7 @@ export default class Todos {
       className: 'footer-button',
       isHighlight: true,
       isHighlightDefault: false,
+      href: '#/completed',
       onClick: (event) => {
         emiter.emit({ eventName: 'showComplitedTodos', args: [event] })
       },
@@ -597,34 +623,49 @@ export default class Todos {
     todosContainerElement.append(todosBodyElement)
     todosContainerElement.append(todosSublinesListElement)
 
-    // const oldTodos = JSON.parse(localStorage.getItem('todos'))
+    document.addEventListener('DOMContentLoaded', async (event) => {
+      const res = await callApi('/todos', {
+        method: 'GET',
+      })
+      const oldTodos = res.payload.list
 
-    // if (oldTodos?.length > 0) {
-    //   document.addEventListener('DOMContentLoaded', (event) => {
-    //     const todosCurrentState = JSON.parse(localStorage.getItem('todosState'))
-    //     CHEACK_ALL_STATE.isActive = JSON.parse(
-    //       localStorage.getItem('checkAllState')
-    //     ).isActive
-    //     emiter.emit({ eventName: 'loadOldTodos', args: [event, oldTodos] })
+      // const todosCurrentState = JSON.parse(localStorage.getItem('todosState'))
+      emiter.emit({
+        eventName: 'loadOldTodos',
+        args: [event, oldTodos.sort((a, b) => a.sort - b.sort)],
+      })
 
-    //     CHEACK_ALL_STATE.isActive
-    //       ? checkAllButtonElement.classList.add('active')
-    //       : checkAllButtonElement.classList.remove('active')
+      if (window.location.hash === '#') {
+        emiter.emit({ eventName: 'showAllTodos', args: [event] })
+        Button.makeActive(allButton)
+      }
+      if (window.location.hash === '#/active') {
+        emiter.emit({ eventName: 'showActiveTodos', args: [event] })
+        Button.makeActive(activeButton)
+      }
+      if (window.location.hash === '#/completed') {
+        emiter.emit({ eventName: 'showComplitedTodos', args: [event] })
+        Button.makeActive(completedButton)
+      }
+    })
 
-    //     if (todosCurrentState === TODOS_STATES.ALL) {
-    //       emiter.emit({ eventName: 'showAllTodos', args: [event] })
-    //       Button.makeActive(allButton)
-    //     }
-    //     if (todosCurrentState === TODOS_STATES.ACTIVE) {
-    //       emiter.emit({ eventName: 'showActiveTodos', args: [event] })
-    //       Button.makeActive(activeButton)
-    //     }
-    //     if (todosCurrentState === TODOS_STATES.COMPLETED) {
-    //       emiter.emit({ eventName: 'showComplitedTodos', args: [event] })
-    //       Button.makeActive(completedButton)
-    //     }
-    //   })
-    // }
+    window.addEventListener('popstate', () => {
+      
+      if (window.location.hash === '') {
+        emiter.emit({ eventName: 'showAllTodos', args: [event] })
+        Button.makeActive(allButton)
+      }
+      if (window.location.hash === '#/active') {
+        emiter.emit({ eventName: 'showActiveTodos', args: [event] })
+        Button.makeActive(activeButton)
+      }
+      if (window.location.hash === '#/completed') {
+        emiter.emit({ eventName: 'showComplitedTodos', args: [event] })
+        Button.makeActive(completedButton)
+      }
+
+      
+    })
 
     if (this.todos.length === 0) {
       emiter.emit({ eventName: 'hideTodosOptions', args: [] })

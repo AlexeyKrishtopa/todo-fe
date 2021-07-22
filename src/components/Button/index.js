@@ -10,6 +10,7 @@ export default class Button extends Component {
     this.onClick = options.onClick ?? null
     this.isHighlight = options.isHighlight ?? false
     this.isHighlightDefault = options.isHighlightDefault ?? false
+    this.href = options.href ?? '#'
   }
 
   static makeActive(button) {
@@ -38,6 +39,11 @@ export default class Button extends Component {
 
       buttonElement.addEventListener('click', (event) => {
         const buttonElement = event.target
+
+        location.replace(this.href)
+
+        console.log(history)
+        history.pushState
 
         if (!buttonElement.classList.contains('button')) return
 
