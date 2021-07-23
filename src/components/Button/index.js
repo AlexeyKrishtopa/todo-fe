@@ -42,9 +42,6 @@ export default class Button extends Component {
 
         location.replace(this.href)
 
-        console.log(history)
-        history.pushState
-
         if (!buttonElement.classList.contains('button')) return
 
         Button._highlight(buttonElement)

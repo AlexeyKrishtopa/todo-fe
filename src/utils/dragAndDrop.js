@@ -50,12 +50,7 @@ export const dragAndDrop = (todosComponent) => {
       return
     }
 
-    //logic of todosComponent.todos sort
-
     await todosElement.insertBefore(activeElement, nextElement)
-
-    // todosComponent._updateTodos()
-    console.log(todosComponent.todos)
 
     if (activeElement.nextElementSibling) {
       const previousTodoId = activeElement.previousElementSibling?.id
@@ -66,7 +61,7 @@ export const dragAndDrop = (todosComponent) => {
       let activeTodo = null
       let prevTodo = null
 
-      todosComponent.todos.forEach((todo) => {
+      todosComponent.state.todos.forEach((todo) => {
         if (todo._id === previousTodoId) {
           prevTodo = todo
         }
@@ -83,7 +78,6 @@ export const dragAndDrop = (todosComponent) => {
       !prevTodo?.sort ? (prevTodoSort = 0) : (prevTodoSort = prevTodo.sort)
 
       activeTodo.sort = (+prevTodoSort + +nextTodo.sort) / 2
-      console.log(activeTodo)
 
       await callApi(`/todos/${activeTodo._id}`, {
         method: 'PUT',
@@ -98,7 +92,7 @@ export const dragAndDrop = (todosComponent) => {
       let prevTodo = null
       const activeTodoId = activeElement.id
       const previousTodoId = activeElement.previousElementSibling.id
-      todosComponent.todos.forEach((todo) => {
+      todosComponent.state.todos.forEach((todo) => {
         if (todo._id === activeTodoId) {
           activeTodo = todo
         }
@@ -108,8 +102,6 @@ export const dragAndDrop = (todosComponent) => {
       })
 
       activeTodo.sort = prevTodo.sort + 1
-
-      console.log(activeTodo)
 
       await callApi(`/todos/${activeTodo._id}`, {
         method: 'PUT',
@@ -121,8 +113,7 @@ export const dragAndDrop = (todosComponent) => {
       })
     }
 
-    console.log(todosComponent.todos)
-    localStorage.setItem('todos', JSON.stringify(todosComponent.todos, null, 2))
+    localStorage.setItem('todos', JSON.stringify(todosComponent.state.todos, null, 2))
   }
 
   todosElement.removeEventListener('dragover', handleDrag)

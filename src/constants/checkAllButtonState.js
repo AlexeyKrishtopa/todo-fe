@@ -1,3 +1,4 @@
-export const CHEACK_ALL_STATE = {
-  isActive: false,
+export const CHEACK_ALL_BUTTON_STATES = {
+  ACTIVE: true,
+  NOT_ACTIVE: false,
 }
