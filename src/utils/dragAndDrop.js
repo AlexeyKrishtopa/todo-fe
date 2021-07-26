@@ -1,6 +1,6 @@
-import callApi from '../utils/callApi'
+import store from './Store'
 
-export const dragAndDrop = (todosComponent) => {
+export const dragAndDrop = () => {
   const todosElement = document.querySelector('.todos__list')
 
   todosElement.addEventListener('dragstart', (event) => {
@@ -25,7 +25,7 @@ export const dragAndDrop = (todosComponent) => {
     return nextElement
   }
 
-  const handleDrag = async (event) => {
+  const handleDrag = (event) => {
     event.preventDefault()
 
     const todosElement = document.querySelector('.todos__list')
@@ -50,7 +50,7 @@ export const dragAndDrop = (todosComponent) => {
       return
     }
 
-    await todosElement.insertBefore(activeElement, nextElement)
+    todosElement.insertBefore(activeElement, nextElement)
 
     if (activeElement.nextElementSibling) {
       const previousTodoId = activeElement.previousElementSibling?.id
@@ -61,14 +61,14 @@ export const dragAndDrop = (todosComponent) => {
       let activeTodo = null
       let prevTodo = null
 
-      todosComponent.state.todos.forEach((todo) => {
-        if (todo._id === previousTodoId) {
+      store.state.todos.forEach((todo) => {
+        if (+todo._id === +previousTodoId) {
           prevTodo = todo
         }
-        if (todo._id === activeTodoId) {
+        if (+todo._id === +activeTodoId) {
           activeTodo = todo
         }
-        if (todo._id === nextTodoId) {
+        if (+todo._id === +nextTodoId) {
           nextTodo = todo
         }
       })
@@ -78,42 +78,24 @@ export const dragAndDrop = (todosComponent) => {
       !prevTodo?.sort ? (prevTodoSort = 0) : (prevTodoSort = prevTodo.sort)
 
       activeTodo.sort = (+prevTodoSort + +nextTodo.sort) / 2
-
-      await callApi(`/todos/${activeTodo._id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          description: activeTodo.description,
-          completed: activeTodo.completed,
-          sort: activeTodo.sort,
-        }),
-      })
     } else {
       let activeTodo = null
       let prevTodo = null
       const activeTodoId = activeElement.id
       const previousTodoId = activeElement.previousElementSibling.id
-      todosComponent.state.todos.forEach((todo) => {
-        if (todo._id === activeTodoId) {
+      store.state.todos.forEach((todo) => {
+        if (+todo._id === +activeTodoId) {
           activeTodo = todo
         }
-        if (todo._id === previousTodoId) {
+        if (+todo._id === +previousTodoId) {
           prevTodo = todo
         }
       })
 
       activeTodo.sort = prevTodo.sort + 1
-
-      await callApi(`/todos/${activeTodo._id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          description: activeTodo.description,
-          completed: activeTodo.completed,
-          sort: activeTodo.sort,
-        }),
-      })
     }
 
-    localStorage.setItem('todos', JSON.stringify(todosComponent.state.todos, null, 2))
+    console.log(store.state)
   }
 
   todosElement.removeEventListener('dragover', handleDrag)

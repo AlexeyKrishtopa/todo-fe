@@ -1,7 +1,7 @@
-import { Todos } from "../../components/Todos";
+import { TodosPage } from '../../components/TodosPage'
 
 const root = document.querySelector('.root')
 
-const todosComponent = new Todos()
+const todosPageComponent = new TodosPage()
 
-root.innerHTML = todosComponent.render()
+root.append(todosPageComponent.render())
