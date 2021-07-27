@@ -1,4 +1,5 @@
 import store from './Store'
+import callApi from './callApi'
 
 export const dragAndDrop = () => {
   const todosElement = document.querySelector('.todos__list')
@@ -25,7 +26,7 @@ export const dragAndDrop = () => {
     return nextElement
   }
 
-  const handleDrag = (event) => {
+  const handleDrag = async (event) => {
     event.preventDefault()
 
     const todosElement = document.querySelector('.todos__list')
@@ -62,13 +63,13 @@ export const dragAndDrop = () => {
       let prevTodo = null
 
       store.state.todos.forEach((todo) => {
-        if (+todo._id === +previousTodoId) {
+        if (todo._id === previousTodoId) {
           prevTodo = todo
         }
-        if (+todo._id === +activeTodoId) {
+        if (todo._id === activeTodoId) {
           activeTodo = todo
         }
-        if (+todo._id === +nextTodoId) {
+        if (todo._id === nextTodoId) {
           nextTodo = todo
         }
       })
@@ -78,24 +79,42 @@ export const dragAndDrop = () => {
       !prevTodo?.sort ? (prevTodoSort = 0) : (prevTodoSort = prevTodo.sort)
 
       activeTodo.sort = (+prevTodoSort + +nextTodo.sort) / 2
+
+      await callApi(`/todos/${activeTodo._id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          description: activeTodo.description,
+          completed: activeTodo.completed,
+          sort: activeTodo.sort,
+        }),
+      })
     } else {
       let activeTodo = null
       let prevTodo = null
       const activeTodoId = activeElement.id
       const previousTodoId = activeElement.previousElementSibling.id
       store.state.todos.forEach((todo) => {
-        if (+todo._id === +activeTodoId) {
+        if (todo._id === activeTodoId) {
           activeTodo = todo
         }
-        if (+todo._id === +previousTodoId) {
+        if (todo._id === previousTodoId) {
           prevTodo = todo
         }
       })
 
       activeTodo.sort = prevTodo.sort + 1
+
+      await callApi(`/todos/${activeTodo._id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          description: activeTodo.description,
+          completed: activeTodo.completed,
+          sort: activeTodo.sort,
+        }),
+      })
     }
 
-    console.log(store.state)
+    //
   }
 
   todosElement.removeEventListener('dragover', handleDrag)

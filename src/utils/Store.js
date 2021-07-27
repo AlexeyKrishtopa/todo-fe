@@ -63,8 +63,8 @@ export class Store {
         this.state = {
           ...this.state,
           todos: this.state.todos.map((todo) => {
-            if (+todo._id === +action.payload._id) {
-              todo.completed = !todo.completed
+            if (todo._id === action.payload._id) {
+              todo = action.payload
             }
 
             return todo
@@ -78,7 +78,7 @@ export class Store {
           ...this.state,
           todos: this.state.todos.map((todo) => {
             if (todo._id === action.payload._id) {
-              todo.description = action.payload.description
+              todo = action.payload
             }
 
             return todo
@@ -125,6 +125,16 @@ export class Store {
           ...this.state,
           todos: this.state.todos.filter((todo) => !todo.completed)
         }
+        emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })
+        break
+      case ACTION_TYPES.LOAD_OLD_TODOS:
+        console.log('ANDREW')
+        this.state = {
+          ...this.state,
+          todosState: TODOS_STATES.ALL,
+          todos: action.payload
+        }
+        // console.log(this.state)
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })
         break
       default:

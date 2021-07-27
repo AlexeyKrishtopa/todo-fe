@@ -31,7 +31,7 @@ class EventEmitter {
 
 export const emiter = new EventEmitter()
 
-emiter.subscribe(ACTION_TYPES.RERENDER_TODOS_LIST, () => {
+emiter.subscribe(ACTION_TYPES.RERENDER_TODOS_LIST, async () => {
   const todosListElement = document.querySelector('.todos__list')
   const todoCheckAllElement = document.querySelector('.todos__check-all')
   const todosCountElement = document.querySelector('.todos__count')
@@ -52,7 +52,6 @@ emiter.subscribe(ACTION_TYPES.RERENDER_TODOS_LIST, () => {
   store.isCompletedAll()
     ? todoCheckAllElement.classList.add('active')
     : todoCheckAllElement.classList.remove('active')
-  console.log(store.state)
 
   if (store.state.todosState === TODOS_STATES.ALL) {
     store.state.todos

@@ -1,6 +1,9 @@
 import { Todos } from '../Todos'
 import Component from '../../utils/Component'
+import { ACTION_TYPES } from '../../constants/actionTypes'
+import callApi from '../../utils/callApi'
 import './style.scss'
+import store from '../../utils/Store'
 
 export class TodosPage extends Component {
   constructor(options) {
@@ -21,6 +24,16 @@ export class TodosPage extends Component {
 
     todosContainerElement.append(todosHeaderElement)
     todosContainerElement.append(todosBodyComponent.render())
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const res = await callApi('/todos', {
+        method: 'GET',
+      })
+      const oldTodos = res.payload.list
+      store.dispatch({ type: ACTION_TYPES.LOAD_OLD_TODOS, payload: oldTodos })
+    })
+
+    
 
     return todosContainerElement
   }

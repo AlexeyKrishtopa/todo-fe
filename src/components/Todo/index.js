@@ -1,7 +1,7 @@
 import Component from '../../utils/Component'
 import store from '../../utils/Store'
 import { ACTION_TYPES } from '../../constants/actionTypes'
-import './style.scss'
+import callApi from '../../utils/callApi'
 
 export class Todo extends Component {
   constructor(options) {
@@ -20,12 +20,28 @@ export class Todo extends Component {
     todoCheckboxElement.classList.add('todos__todo-checkbox')
     todoCheckboxElement.type = 'checkbox'
     todoCheckboxElement.checked = this.completed
-    todoCheckboxElement.addEventListener('click', (event) => {
+    todoCheckboxElement.addEventListener('click', async (event) => {
       event.preventDefault()
+      const currentTodoElement = event.target.closest('.todos__todo')
+
+      const oldTodo = store.state.todos.find(
+        (todo) => todo._id === currentTodoElement.id
+      )
+
+      const res = await callApi(`/todos/${currentTodoElement.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          description: oldTodo.description,
+          completed: !oldTodo.completed,
+          sort: oldTodo.sort,
+        }),
+      })
+
+      const updatedTodo = res.payload.dto
 
       store.dispatch({
         type: ACTION_TYPES.CHECK_TODO,
-        payload: { _id: event.target.closest('.todos__todo').id },
+        payload: updatedTodo,
       })
     })
 
@@ -36,14 +52,18 @@ export class Todo extends Component {
     const todoDeleteButtonElement = document.createElement('button')
     todoDeleteButtonElement.classList.add('todos__todo-delete')
     todoDeleteButtonElement.innerText = '×'
-    todoDeleteButtonElement.addEventListener('click', (event) => {
+    todoDeleteButtonElement.addEventListener('click', async (event) => {
       event.preventDefault()
+
+      const res = await callApi(`/todos/${todoElement.id}`, {
+        method: 'DELETE',
+      })
+
+      const deletedTodo = res.payload.dto
 
       store.dispatch({
         type: ACTION_TYPES.REMOVE_TODO,
-        payload: {
-          _id: +todoElement.id,
-        },
+        payload: deletedTodo,
       })
     })
 
@@ -71,7 +91,6 @@ export class Todo extends Component {
       if (clicksCount === 1) {
         timerId = setTimeout(() => {
           //
-          console.log('1 click')
           clearInterval(timerId)
           timerId = null
           clicksCount = 0
@@ -94,15 +113,27 @@ export class Todo extends Component {
 
           tempInputElement.focus()
 
-          tempInputElement.addEventListener('blur', () => {
-            const newPayload = {
-              _id: +currentTodoElement.id,
-              description: tempInputElement.value,
-            }
+          tempInputElement.addEventListener('blur', async () => {
+            const oldTodo = store.state.todos.find(
+              (todo) => todo._id === currentTodoElement.id
+            )
+
+            const res = await callApi(`/todos/${currentTodoElement.id}`, {
+              method: 'PUT',
+              body: JSON.stringify({
+                description:
+                  tempInputElement.value ||
+                  currentTodoDescriptionElement.innerText,
+                completed: oldTodo.completed,
+                sort: oldTodo.sort,
+              }),
+            })
+
+            const updatedTodo = res.payload.dto
 
             store.dispatch({
               type: ACTION_TYPES.CHANGE_TODO_DESCRIPTION,
-              payload: newPayload,
+              payload: updatedTodo,
             })
 
             tempInputElement.remove()

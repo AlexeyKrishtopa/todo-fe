@@ -3,6 +3,7 @@ import Component from '../../utils/Component'
 import store from '../../utils/Store'
 import { checkAllSVG } from '../../constants/checkAllSVG'
 import { Button } from '../Button'
+import callApi from '../../utils/callApi'
 
 export class Todos extends Component {
   constructor(options) {
@@ -29,12 +30,23 @@ export class Todos extends Component {
     const todosCheckAllElement = document.createElement('button')
     todosCheckAllElement.classList.add('todos__check-all')
     todosCheckAllElement.innerHTML = checkAllSVG
-    todosCheckAllElement.addEventListener('click', (event) => {
+    todosCheckAllElement.addEventListener('click', async (event) => {
       event.preventDefault()
 
-      store.dispatch({
+      await store.dispatch({
         type: ACTION_TYPES.TOGGLE_CHECK_ALL,
         payload: {},
+      })
+      //api
+      store.state.todos.forEach(async (todo) => {
+        await callApi(`/todos/${todo._id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            description: todo.description,
+            completed: todo.completed,
+            sort: todo.sort,
+          }),
+        })
       })
     })
 
@@ -44,19 +56,23 @@ export class Todos extends Component {
     const todosInputElement = document.createElement('input')
     todosInputElement.classList.add('todos__input')
     todosInputElement.placeholder = 'What needs to be done?'
-    todosInputElement.addEventListener('keypress', (event) => {
+    todosInputElement.addEventListener('keypress', async (event) => {
       if (event.key === 'Enter') {
         event.preventDefault()
 
         if (todosInputElement.value) {
-          const newTodo = {
-            _id: Date.now(),
-            description: todosInputElement.value,
-            completed: false,
-            sort: store.state.todos.length
-              ? store.state.todos[store.state.todos.length - 1].sort + 1
-              : 1,
-          }
+          const res = await callApi('/todos', {
+            method: 'POST',
+            body: JSON.stringify({
+              description: todosInputElement.value,
+              completed: false,
+              sort: store.state.todos.length
+                ? store.state.todos[store.state.todos.length - 1].sort + 1
+                : 1,
+            }),
+          })
+
+          const newTodo = res.payload.dto
 
           store.dispatch({
             type: ACTION_TYPES.ADD_NEW_TODO,
@@ -104,9 +120,17 @@ export class Todos extends Component {
     const clreaCompletedTodosComponent = new Button({
       label: 'Clear compelted',
       className: 'todos__clear-completed',
-      onClick: () => {
-        store.dispatch({ type: ACTION_TYPES.CLEAR_COMPLETED, payload: {} })
-      }
+      onClick: async () => {
+        store.state.todos.forEach(async (todo) => {
+          if (todo.completed) {
+            await callApi(`/todos/${todo._id}`, {
+              method: 'DELETE',
+            })
+          }
+        })
+
+        store.dispatch({ type: ACTION_TYPES.CLEAR_COMPLETED, payload: {} })   
+      },
     })
 
     todosOptionsContainerElement.append(allTodosComponent.render())
