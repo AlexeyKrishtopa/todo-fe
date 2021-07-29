@@ -1,5 +1,6 @@
 import store from './Store'
 import callApi from './callApi'
+import { storeStateLogger } from './storeStateLogger'
 
 export const dragAndDrop = () => {
   const todosElement = document.querySelector('.todos__list')
@@ -120,6 +121,7 @@ export const dragAndDrop = () => {
       })
     }
 
+    storeStateLogger('After drag')
     //
   }
 
