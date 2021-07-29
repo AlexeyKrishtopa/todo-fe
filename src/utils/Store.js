@@ -2,6 +2,7 @@
 import { emiter } from './EventEmmiter'
 import { ACTION_TYPES } from '../constants/actionTypes'
 import { TODOS_STATES } from '../constants/todosStates'
+import { storeStateLogger } from './storeStateLogger'
 
 export class Store {
   constructor() {
@@ -44,6 +45,7 @@ export class Store {
   }
 
   reducer(action) {
+    storeStateLogger('Before')
     switch (action.type) {
       case ACTION_TYPES.ADD_NEW_TODO:
         this.state = {
@@ -142,7 +144,10 @@ export class Store {
         break
       default:
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })
+        
     }
+
+    storeStateLogger('After')
   }
 }
 
