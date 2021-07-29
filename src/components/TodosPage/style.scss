@@ -8,6 +8,7 @@ body {
   &__container {
     max-width: 960px;
     margin: 0 auto;
+    padding-top: 56px;
   }
   &__header {
     color: rgba(165, 42, 42, 0.219);
@@ -19,11 +20,13 @@ body {
     margin-bottom: 32px;
   }
   &__form {
+    position: relative;
     width: 100%;
     display: flex;
     justify-content: space-between;
     padding: 16px 24px;
     border-bottom: 1px solid #ededed;
+    min-height: 60px;
   }
   &__check-all {
     cursor: pointer;
@@ -42,6 +45,9 @@ body {
     width: 24px;
   }
   &__input {
+    position: absolute;
+    top: 20%;
+    right: 5%;
     width: 288px;
     border: none;
     outline: none;
@@ -164,7 +170,7 @@ body {
       color: #4d4d4d;
       box-sizing: border-box;
       &:hover {
-          outline: 1px solid rgba(207, 6, 6, 0.158);
+        outline: 1px solid rgba(207, 6, 6, 0.158);
       }
     }
   }
@@ -185,5 +191,5 @@ body {
 }
 
 .active-option {
-    border: 1px solid rgba(207, 6, 6, 0.295);
+  border: 1px solid rgba(207, 6, 6, 0.295);
 }

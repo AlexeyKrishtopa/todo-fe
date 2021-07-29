@@ -7,6 +7,10 @@ export class Store {
   constructor() {
     this.state = {
       todos: [],
+      currentUser: {
+        accessToken:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTAyOTUwNDhkNjQ4N2YxZWI3YjkyZDEiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNjI3NTY0Njg1LCJleHAiOjE2Mjc1ODI2ODV9.p4HkzlnqObgGxYduwePuXbxGO024ytlZy45Dvgvev_M',
+      },
       todosState: TODOS_STATES.ALL,
     }
   }
@@ -123,16 +127,15 @@ export class Store {
       case ACTION_TYPES.CLEAR_COMPLETED:
         this.state = {
           ...this.state,
-          todos: this.state.todos.filter((todo) => !todo.completed)
+          todos: this.state.todos.filter((todo) => !todo.completed),
         }
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })
         break
       case ACTION_TYPES.LOAD_OLD_TODOS:
-        console.log('ANDREW')
         this.state = {
           ...this.state,
           todosState: TODOS_STATES.ALL,
-          todos: action.payload
+          todos: action.payload,
         }
         // console.log(this.state)
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })

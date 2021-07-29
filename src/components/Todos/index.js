@@ -41,6 +41,9 @@ export class Todos extends Component {
       store.state.todos.forEach(async (todo) => {
         await callApi(`/todos/${todo._id}`, {
           method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${store.state.currentUser.accessToken}`
+          },
           body: JSON.stringify({
             description: todo.description,
             completed: todo.completed,
@@ -63,6 +66,9 @@ export class Todos extends Component {
         if (todosInputElement.value) {
           const res = await callApi('/todos', {
             method: 'POST',
+            headers: {
+              Authorization: `Bearer ${store.state.currentUser.accessToken}`
+            },
             body: JSON.stringify({
               description: todosInputElement.value,
               completed: false,
@@ -99,6 +105,7 @@ export class Todos extends Component {
     const allTodosComponent = new Button({
       label: 'All',
       className: 'todos__todo-all',
+      href: '#',
       onClick: () => {
         store.dispatch({ type: ACTION_TYPES.SHOW_ALL_TODOS, payload: {} })
       },
@@ -106,6 +113,7 @@ export class Todos extends Component {
     const completedTodosComponent = new Button({
       label: 'Completed',
       className: 'todos__todo-completed',
+      href: '#/completed',
       onClick: () => {
         store.dispatch({ type: ACTION_TYPES.SHOW_COMPLETED_TODOS, payload: {} })
       },
@@ -113,6 +121,7 @@ export class Todos extends Component {
     const activeTodosComponent = new Button({
       label: 'Active',
       className: 'todos__todo-active',
+      href: '#/active',
       onClick: () => {
         store.dispatch({ type: ACTION_TYPES.SHOW_ACTIVE_TODOS, payload: {} })
       },

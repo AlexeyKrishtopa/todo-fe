@@ -28,12 +28,22 @@ export class TodosPage extends Component {
     document.addEventListener('DOMContentLoaded', async () => {
       const res = await callApi('/todos', {
         method: 'GET',
+        headers: {
+          Authorization: `Bearer ${store.state.currentUser.accessToken}`,
+        },
       })
       const oldTodos = res.payload.list
       store.dispatch({ type: ACTION_TYPES.LOAD_OLD_TODOS, payload: oldTodos })
+      if (location.hash === '' && location.hash === '#') {
+        store.dispatch({ type: ACTION_TYPES.SHOW_ALL_TODOS, payload: {} })
+      }
+      if (location.hash === '#/active') {
+        store.dispatch({ type: ACTION_TYPES.SHOW_ACTIVE_TODOS, payload: {} })
+      }
+      if (location.hash === '#/completed') {
+        store.dispatch({ type: ACTION_TYPES.SHOW_COMPLETED_TODOS, payload: {} })
+      }
     })
-
-    
 
     return todosContainerElement
   }

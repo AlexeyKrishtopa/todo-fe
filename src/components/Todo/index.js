@@ -30,6 +30,9 @@ export class Todo extends Component {
 
       const res = await callApi(`/todos/${currentTodoElement.id}`, {
         method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${store.state.currentUser.accessToken}`,
+        },
         body: JSON.stringify({
           description: oldTodo.description,
           completed: !oldTodo.completed,
@@ -57,6 +60,9 @@ export class Todo extends Component {
 
       const res = await callApi(`/todos/${todoElement.id}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${store.state.currentUser.accessToken}`,
+        },
       })
 
       const deletedTodo = res.payload.dto
@@ -120,6 +126,9 @@ export class Todo extends Component {
 
             const res = await callApi(`/todos/${currentTodoElement.id}`, {
               method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${store.state.currentUser.accessToken}`,
+              },
               body: JSON.stringify({
                 description:
                   tempInputElement.value ||
