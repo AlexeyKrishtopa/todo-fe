@@ -3,14 +3,17 @@ import { emiter } from './EventEmmiter'
 import { ACTION_TYPES } from '../constants/actionTypes'
 import { TODOS_STATES } from '../constants/todosStates'
 import { storeStateLogger } from './storeStateLogger'
+import redirector from './redirector'
+import { PAGE_TYPES } from '../constants/pageTypes'
 
 export class Store {
   constructor() {
     this.state = {
       todos: [],
       currentUser: {
-        accessToken:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTAyOTUwNDhkNjQ4N2YxZWI3YjkyZDEiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNjI3NTY0Njg1LCJleHAiOjE2Mjc1ODI2ODV9.p4HkzlnqObgGxYduwePuXbxGO024ytlZy45Dvgvev_M',
+        // accessToken:
+        //   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTAzZmUwOGYzODk0MGIxYmM0MGM4ZGIiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNjI3NjU2MDM1LCJleHAiOjE2Mjc2NTYxNTV9.ElzLwMTT87mPqh6xofYaI-aFEAoPMrMNFUeyjTBi_Ng',
+        // refreshToken: '',
       },
       todosState: TODOS_STATES.ALL,
     }
@@ -142,9 +145,27 @@ export class Store {
         // console.log(this.state)
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })
         break
+      case ACTION_TYPES.REDIRECT_TODOS:
+        redirector.redirect(PAGE_TYPES.TODOS_PAGE)
+        emiter.emit({ eventName: ACTION_TYPES.LOAD_CONTENT, args: [] })
+        break
+      case ACTION_TYPES.REDIRECT_SIGN_IN:
+        redirector.redirect(PAGE_TYPES.SIGNIN_PAGE)
+        break
+      case ACTION_TYPES.REDIRECT_SIGN_UP:
+        redirector.redirect(PAGE_TYPES.REGISTRATION_PAGE)
+        break
+      case ACTION_TYPES.REFRESH_TOKEN:
+        this.state = {
+          ...this.state,
+          currentUser: {
+            accessToken: action.payload.accessToken,
+            refreshToken: action.payload.refreshToken
+          }
+        } 
+        break
       default:
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })
-        
     }
 
     storeStateLogger('After')

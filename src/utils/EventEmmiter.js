@@ -3,6 +3,7 @@ import store from './Store'
 import { Todo } from '../components/Todo'
 import { dragAndDrop } from './dragAndDrop'
 import { TODOS_STATES } from '../constants/todosStates'
+import { handleDOMContentLoaded } from './handleDOMContentLoaded'
 
 class EventEmitter {
   constructor() {
@@ -114,3 +115,4 @@ emiter.subscribe(ACTION_TYPES.RERENDER_TODOS_LIST, async () => {
 
   dragAndDrop()
 })
+emiter.subscribe(ACTION_TYPES.LOAD_CONTENT, handleDOMContentLoaded)

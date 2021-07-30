@@ -184,6 +184,31 @@ body {
       text-decoration: underline;
     }
   }
+
+  &__user-options-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px 10px;
+    width: 100%;
+    background-color: transparent;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__sign-out {
+    font-family: 'Open Snas', sans-serif;
+    font-size: 24px;
+    padding: 8px;
+    border: none;
+    outline: none;
+    border-radius: 4px;
+    background-color: rgba(165, 42, 42, 0.219);
+    color: #fff;
+    &:hover {
+      background-color: rgba(165, 42, 42, 0.521);
+    }
+  }
 }
 
 .hidden {

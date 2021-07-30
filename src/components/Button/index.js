@@ -12,7 +12,7 @@ export class Button {
     buttonElement.innerText = this.label
     buttonElement.addEventListener('click', () => {
       if (this.href) {
-        location.replace(this.href)
+        history.pushState(null, '', this.href)
       }
       this.onClick()
     })

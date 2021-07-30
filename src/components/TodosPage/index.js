@@ -1,9 +1,9 @@
 import { Todos } from '../Todos'
 import Component from '../../utils/Component'
+import { handleDOMContentLoaded } from '../../utils/handleDOMContentLoaded'
 import { ACTION_TYPES } from '../../constants/actionTypes'
-import callApi from '../../utils/callApi'
-import './style.scss'
 import store from '../../utils/Store'
+import './style.scss'
 
 export class TodosPage extends Component {
   constructor(options) {
@@ -25,39 +25,20 @@ export class TodosPage extends Component {
     todosContainerElement.append(todosHeaderElement)
     todosContainerElement.append(todosBodyComponent.render())
 
-    document.addEventListener(
-      'DOMContentLoaded',
-      async function handleDOMContentLoaded() {
-        if (document.querySelector('.todos__list')) {
-          const res = await callApi('/todos', {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-            },
-          })
-          const oldTodos = res.payload.list
-          store.dispatch({
-            type: ACTION_TYPES.LOAD_OLD_TODOS,
-            payload: oldTodos,
-          })
-          if (location.hash === '' && location.hash === '#') {
-            store.dispatch({ type: ACTION_TYPES.SHOW_ALL_TODOS, payload: {} })
-          }
-          if (location.hash === '#/active') {
-            store.dispatch({
-              type: ACTION_TYPES.SHOW_ACTIVE_TODOS,
-              payload: {},
-            })
-          }
-          if (location.hash === '#/completed') {
-            store.dispatch({
-              type: ACTION_TYPES.SHOW_COMPLETED_TODOS,
-              payload: {},
-            })
-          }
-        }
-      }
-    )
+    const signOutElement = document.createElement('button')
+    signOutElement.innerText = 'signout'
+    signOutElement.classList.add('todos__sign-out')
+    const userOptionsContainer = document.createElement('div')
+    userOptionsContainer.classList.add('todos__user-options-container')
+    signOutElement.addEventListener('click', (event) => {
+      event.preventDefault()
+      store.dispatch({ type: ACTION_TYPES.REDIRECT_SIGN_IN, payload: {} })
+    })
+
+    userOptionsContainer.append(signOutElement)
+    todosContainerElement.append(userOptionsContainer)
+
+    document.addEventListener('DOMContentLoaded', handleDOMContentLoaded)
 
     return todosContainerElement
   }
