@@ -17,10 +17,10 @@ const signin = async (login, password) => {
   })
 
   if (+res.status === 404) {
-    return false
+    return res
   }
 
-  store.dispatch({type: ACTION_TYPES.REFRESH_TOKEN, payload: res.payload})
+  store.dispatch({ type: ACTION_TYPES.REFRESH_TOKEN, payload: res.payload })
 
   return res
 }
@@ -43,18 +43,30 @@ export class SignInPage extends Component {
     signInButtonElement.innerText = 'SignIn'
     const signInFormContainer = document.createElement('div')
 
+
+    const errorMessageElement = document.createElement('div')
+    errorMessageElement.classList.add('signin__error-message')
+
     signInButtonElement.addEventListener('click', async (event) => {
       event.preventDefault()
-      console.log('логин')
-      // В пейлоду передать юзернейм и пароль
-      const res = await signin(loginInputElement.value, passwordInputElement.value)
-      
-      if(res) {
+
+      const res = await signin(
+        loginInputElement.value,
+        passwordInputElement.value
+      )
+
+      if (+res.status === 200) {
         store.dispatch({ type: ACTION_TYPES.REDIRECT_TODOS, payload: {} })
       } else {
-        console.log(res)
+        const errorMessage = res.message.split(':')[1].trim()
+        errorMessageElement.innerText = errorMessage
       }
-      
+    })
+    loginInputElement.addEventListener('input', () => {
+      errorMessageElement.innerText = ''
+    })
+    passwordInputElement.addEventListener('input', () => {
+      errorMessageElement.innerText = ''
     })
 
     const signInHeaderElement = document.createElement('div')
@@ -67,6 +79,7 @@ export class SignInPage extends Component {
     signInFormElement.append(passwordInputElement)
     signInFormElement.append(signInButtonElement)
     signInFormContainer.append(signInFormElement)
+    signInFormContainer.append(errorMessageElement)
 
     signInContainer.append(signInHeaderElement)
     signInContainer.append(signInFormContainer)

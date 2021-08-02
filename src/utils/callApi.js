@@ -4,6 +4,7 @@ import store from './Store'
 
 const callApi = async (url, options) => {
   const res = await fetch('http://localhost:3000/api' + url, options)
+
   let json = await res.json()
 
   if (+json.statusCode === 401) {
@@ -12,8 +13,7 @@ const callApi = async (url, options) => {
       {
         method: 'POST',
         body: JSON.stringify({
-          refreshToken:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTAzZmUwOGYzODk0MGIxYmM0MGM4ZGIiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTYyNzY1NjA0OSwiZXhwIjoxNjI3NzQ2MDQ5fQ.jYs2rEil0MrCgvc3pWBxn6pMyBT3DEWPnAb8dsNCP94',
+          refreshToken: store.state.currentUser.refreshToken,
         }),
       }
     )

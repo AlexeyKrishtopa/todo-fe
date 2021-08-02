@@ -37,22 +37,6 @@ export async function handleDOMContentLoaded() {
 
 export function handleHistory() {
   window.addEventListener('popstate', () => {
-    // console.log(location.hash)
-    // if (location.hash !== '#/singup') {
-    //   console.log('#/singup')
-    //   redirector.redirect(PAGE_TYPES.REGISTRATION_PAGE)
-    // } else if (location.hash !== '#/singin') {
-    //   console.log('#/singin')
-    // } else {
-    //   handleDOMContentLoaded()
-    // }
-
-    // console.log(location.hash)
-    // if (location.hash === '#/singup') {
-    //   redirector.redirect(PAGE_TYPES.REGISTRATION_PAGE)
-    // } else {
-    //   handleDOMContentLoaded()
-    // }
     console.log(location.hash)
     if (location.hash === '#/signup') {
       redirector.redirect(PAGE_TYPES.REGISTRATION_PAGE)

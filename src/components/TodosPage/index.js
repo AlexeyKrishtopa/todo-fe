@@ -3,6 +3,7 @@ import Component from '../../utils/Component'
 import { handleDOMContentLoaded } from '../../utils/handleDOMContentLoaded'
 import { ACTION_TYPES } from '../../constants/actionTypes'
 import store from '../../utils/Store'
+import { ProfileModal } from '../ProfileModal'
 import './style.scss'
 
 export class TodosPage extends Component {
@@ -35,6 +36,20 @@ export class TodosPage extends Component {
       store.dispatch({ type: ACTION_TYPES.REDIRECT_SIGN_IN, payload: {} })
     })
 
+    const profileButtonElement = document.createElement('button')
+    profileButtonElement.classList.add('todos__profile-button')
+    profileButtonElement.innerText = 'profile'
+
+    profileButtonElement.addEventListener('click', (event) => {
+      event.preventDefault()
+
+      document.body.append(new ProfileModal().render())
+      document.body.classList.add('locked')
+
+      event.currentTarget.blur()
+    })
+
+    userOptionsContainer.append(profileButtonElement)
     userOptionsContainer.append(signOutElement)
     todosContainerElement.append(userOptionsContainer)
 

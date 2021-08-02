@@ -16,9 +16,6 @@ const register = async (login, password) => {
     }),
   })
 
-  if (+res.status === 404) {
-    return false
-  }
   return res
 }
 
@@ -40,18 +37,24 @@ export class RegistrPage extends Component {
     registrationButtonElement.innerText = 'Signup'
     const registrationFormContainer = document.createElement('div')
 
+    const errorMessageElement = document.createElement('div')
+    errorMessageElement.classList.add('registration__error-message')
+
+    loginInputElement.addEventListener('input', () => {
+      errorMessageElement.innerHTML = ''
+    })
     registrationButtonElement.addEventListener('click', async (event) => {
       event.preventDefault()
-      console.log('регестрация')
 
       const res = await register(
         loginInputElement.value,
         passwordInputElement.value
       )
-      if (res) {
+      if (!res.message) {
         store.dispatch({ type: ACTION_TYPES.REDIRECT_SIGN_IN, payload: {} })
       } else {
-        console.log('user alredy exist')
+        const errorMessage = res.message.split(':')[1].trim()
+        errorMessageElement.innerText = errorMessage
       }
     })
 
@@ -65,6 +68,7 @@ export class RegistrPage extends Component {
     registrationFormElement.append(passwordInputElement)
     registrationFormElement.append(registrationButtonElement)
     registrationFormContainer.append(registrationFormElement)
+    registrationFormContainer.append(errorMessageElement)
 
     registrationContainer.append(registrationHeaderElement)
     registrationContainer.append(registrationFormContainer)
