@@ -6,7 +6,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.171);
-    transition: all ease-in-out .5s;
+    transition: all ease-in-out 0.5s;
   }
   &__profile-body {
     position: relative;
@@ -20,7 +20,7 @@
     margin-top: 16px;
     padding: 20px 10px;
     box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%), 0 25px 50px 0 rgb(0 0 0 / 10%);
-    transition: all ease-in-out .5s;
+    transition: all ease-in-out 0.5s;
   }
   &__img-container {
     margin-bottom: 8px;
@@ -56,7 +56,7 @@
       font-size: 20px;
       border: none;
       border-bottom: 1px solid #ededed;
-
+      color: #4d4d4d;
       & > *:last-child {
         padding: 10px;
         min-height: 40px;

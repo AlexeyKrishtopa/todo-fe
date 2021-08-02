@@ -5,6 +5,7 @@ import { ACTION_TYPES } from '../../constants/actionTypes'
 import store from '../../utils/Store'
 import { ProfileModal } from '../ProfileModal'
 import './style.scss'
+import callApi from '../../utils/callApi'
 
 export class TodosPage extends Component {
   constructor(options) {
@@ -33,6 +34,7 @@ export class TodosPage extends Component {
     userOptionsContainer.classList.add('todos__user-options-container')
     signOutElement.addEventListener('click', (event) => {
       event.preventDefault()
+      localStorage.setItem('currentUser', null)
       store.dispatch({ type: ACTION_TYPES.REDIRECT_SIGN_IN, payload: {} })
     })
 
@@ -40,13 +42,21 @@ export class TodosPage extends Component {
     profileButtonElement.classList.add('todos__profile-button')
     profileButtonElement.innerText = 'profile'
 
-    profileButtonElement.addEventListener('click', (event) => {
+    profileButtonElement.addEventListener('click', async (event) => {
       event.preventDefault()
 
-      document.body.append(new ProfileModal().render())
+
+      const currentUser = await callApi('/user', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${store.state.currentUser.accessToken}`,
+        },
+      })
+
+      document.body.append(new ProfileModal(currentUser.payload.dto).render())
       document.body.classList.add('locked')
 
-      event.currentTarget.blur()
+      profileButtonElement.blur()
     })
 
     userOptionsContainer.append(profileButtonElement)

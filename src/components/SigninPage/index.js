@@ -7,9 +7,6 @@ import callApi from '../../utils/callApi'
 const signin = async (login, password) => {
   const res = await callApi('/users/signin', {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-    },
     body: JSON.stringify({
       login,
       password,
@@ -19,6 +16,8 @@ const signin = async (login, password) => {
   if (+res.status === 404) {
     return res
   }
+
+  localStorage.setItem('currentUser', JSON.stringify(res))
 
   store.dispatch({ type: ACTION_TYPES.REFRESH_TOKEN, payload: res.payload })
 

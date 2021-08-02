@@ -1,10 +1,17 @@
 import './style.scss'
 import Component from '../../utils/Component'
 import GooseJpg from '../../img/goose.jpg'
+import callApi from '../../utils/callApi'
+import store from '../../utils/Store'
 
 export class ProfileModal extends Component {
   constructor(options) {
     super(options)
+    this.firstName = options.firstName
+    this.secondName = options.secondName
+    this.age = options.age
+    this.phone = options.phone
+    this.mail = options.mail
   }
 
   render() {
@@ -29,56 +36,62 @@ export class ProfileModal extends Component {
     userProfileListElement.classList.add('modal__user-profile-list')
 
     const userFirstNameItemElement = document.createElement('li')
+    userFirstNameItemElement.id = 'firstName'
     userFirstNameItemElement.classList.add('modal__user-first-name-item')
     const userFirstNameLabelElement = document.createElement('div')
     userFirstNameLabelElement.innerText = 'First name:'
     userFirstNameLabelElement.classList.add('modal__user-first-name-label')
     const userFirstNameElement = document.createElement('div')
     userFirstNameElement.classList.add('modal__user-first-name')
-    userFirstNameElement.innerText = ''
+    // this.profileFirstName =
+    userFirstNameElement.innerText = this.firstName
     userFirstNameItemElement.append(userFirstNameLabelElement)
     userFirstNameItemElement.append(userFirstNameElement)
 
     const userSecondNameItemElement = document.createElement('li')
+    userSecondNameItemElement.id = 'secondName'
     userSecondNameItemElement.classList.add('modal__user-second-name-item')
     const userSecondNameLabelElement = document.createElement('div')
     userSecondNameLabelElement.innerText = 'Second name:'
     userSecondNameLabelElement.classList.add('modal__user-second-name-label')
     const userSecondNameElement = document.createElement('div')
     userSecondNameElement.classList.add('modal__user-second-name')
-    userSecondNameElement.innerText = 'Kryshtopa'
+    userSecondNameElement.innerText = this.secondName
     userSecondNameItemElement.append(userSecondNameLabelElement)
     userSecondNameItemElement.append(userSecondNameElement)
 
     const userAgeItemElement = document.createElement('li')
+    userAgeItemElement.id = 'age'
     userAgeItemElement.classList.add('modal__user-age-item')
     const userAgeLabelElement = document.createElement('div')
     userAgeLabelElement.innerText = 'Age:'
     userAgeLabelElement.classList.add('modal__user-age-label')
     const userAgeElement = document.createElement('div')
     userAgeElement.classList.add('modal__user-age')
-    userAgeElement.innerText = '20'
+    userAgeElement.innerText = this.age
     userAgeItemElement.append(userAgeLabelElement)
     userAgeItemElement.append(userAgeElement)
 
     const userPhoneItemElement = document.createElement('li')
+    userPhoneItemElement.id = 'phone'
     userPhoneItemElement.classList.add('modal__user-phone-item')
     const userPhoneLabelElement = document.createElement('div')
     userPhoneLabelElement.innerText = 'Phone:'
     userPhoneLabelElement.classList.add('modal__user-phone-label')
     const userPhoneElement = document.createElement('div')
     userPhoneElement.classList.add('modal__user-phone')
-    userPhoneElement.innerText = '+380731173908'
+    userPhoneElement.innerText = this.phone
     userPhoneItemElement.append(userPhoneLabelElement)
     userPhoneItemElement.append(userPhoneElement)
 
     const userMailItemElement = document.createElement('li')
+    userMailItemElement.id = 'mail'
     userMailItemElement.classList.add('modal__user-mail-item')
     const userMailLabelElement = document.createElement('div')
     userMailLabelElement.innerText = 'Mail:'
     userMailLabelElement.classList.add('modal__user-mail-label')
     const userMailElement = document.createElement('div')
-    userMailElement.innerText = 'kitshkid@gmail.com'
+    userMailElement.innerText = this.mail
     userMailElement.classList.add('modal__user-mail')
     userMailItemElement.append(userMailLabelElement)
     userMailItemElement.append(userMailElement)
@@ -119,17 +132,55 @@ export class ProfileModal extends Component {
 
           tempProfileInputElement.focus()
 
-          tempProfileInputElement.addEventListener('blur', (event) => {
-            currentProfileItem.innerText = tempProfileInputElement.value
-            event.currentTarget.remove()
-          })
-
-          tempProfileInputElement.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
+          tempProfileInputElement.addEventListener('blur', async (event) => {
+            if (tempProfileInputElement.value) {
               currentProfileItem.innerText = tempProfileInputElement.value
+            }
+
+            const profileItem = currentProfileItem.parentElement.id
+            const body = {}
+
+            body[profileItem] = currentProfileItem.innerText
+
+            await callApi('/user', {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${store.state.currentUser.accessToken}`,
+              },
+              body: JSON.stringify(body),
+            })
+            if (event.currentTarget) {
               event.currentTarget.remove()
             }
           })
+
+          tempProfileInputElement.addEventListener(
+            'keypress',
+            async (event) => {
+              if (event.key === 'Enter') {
+                if (tempProfileInputElement.value) {
+                  currentProfileItem.innerText = tempProfileInputElement.value
+                }
+
+                const profileItem = currentProfileItem.parentElement.id
+                const body = {}
+
+                body[profileItem] = currentProfileItem.innerText
+
+                await callApi('/user', {
+                  method: 'PUT',
+                  headers: {
+                    Authorization: `Bearer ${store.state.currentUser.accessToken}`,
+                  },
+                  body: JSON.stringify(body),
+                })
+
+                if (event.currentTarget) {
+                  event.currentTarget.remove()
+                }
+              }
+            }
+          )
 
           clicksCount = 0
           clearInterval(timerId)
