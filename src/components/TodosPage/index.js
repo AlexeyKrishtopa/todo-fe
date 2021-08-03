@@ -34,7 +34,7 @@ export class TodosPage extends Component {
     userOptionsContainer.classList.add('todos__user-options-container')
     signOutElement.addEventListener('click', (event) => {
       event.preventDefault()
-      localStorage.setItem('currentUser', null)
+      localStorage.removeItem('currentUser')
       store.dispatch({ type: ACTION_TYPES.REDIRECT_SIGN_IN, payload: {} })
     })
 
@@ -45,12 +45,8 @@ export class TodosPage extends Component {
     profileButtonElement.addEventListener('click', async (event) => {
       event.preventDefault()
 
-
       const currentUser = await callApi('/user', {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-        },
       })
 
       document.body.append(new ProfileModal(currentUser.payload.dto).render())

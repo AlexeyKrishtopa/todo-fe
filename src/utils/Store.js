@@ -10,11 +10,6 @@ export class Store {
   constructor() {
     this.state = {
       todos: [],
-      currentUser: {
-        // accessToken:
-        //   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTAzZmUwOGYzODk0MGIxYmM0MGM4ZGIiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNjI3NjU2MDM1LCJleHAiOjE2Mjc2NTYxNTV9.ElzLwMTT87mPqh6xofYaI-aFEAoPMrMNFUeyjTBi_Ng',
-        // refreshToken: '',
-      },
       todosState: TODOS_STATES.ALL,
     }
   }
@@ -156,13 +151,8 @@ export class Store {
         redirector.redirect(PAGE_TYPES.REGISTRATION_PAGE)
         break
       case ACTION_TYPES.REFRESH_TOKEN:
-        this.state = {
-          ...this.state,
-          currentUser: {
-            accessToken: action.payload.accessToken,
-            refreshToken: action.payload.refreshToken
-          }
-        } 
+        console.log(action.payload)
+        localStorage.setItem('currentUser', JSON.stringify(action.payload))
         break
       default:
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })

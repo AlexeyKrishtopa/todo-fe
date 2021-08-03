@@ -41,9 +41,6 @@ export class Todos extends Component {
       store.state.todos.forEach(async (todo) => {
         await callApi(`/todos/${todo._id}`, {
           method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${store.state.currentUser.accessToken}`
-          },
           body: JSON.stringify({
             description: todo.description,
             completed: todo.completed,
@@ -66,9 +63,6 @@ export class Todos extends Component {
         if (todosInputElement.value) {
           const res = await callApi('/todos', {
             method: 'POST',
-            headers: {
-              Authorization: `Bearer ${store.state.currentUser.accessToken}`
-            },
             body: JSON.stringify({
               description: todosInputElement.value,
               completed: false,

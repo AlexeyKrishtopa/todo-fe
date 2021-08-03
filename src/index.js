@@ -11,7 +11,7 @@ redirector.redirect(PAGE_TYPES.SIGNIN_PAGE)
 if (currentUser) {
   store.dispatch({
     type: ACTION_TYPES.REFRESH_TOKEN,
-    payload: currentUser.payload,
+    payload: currentUser,
   })
   redirector.redirect(PAGE_TYPES.TODOS_PAGE)
 }

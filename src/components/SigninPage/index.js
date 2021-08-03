@@ -17,8 +17,6 @@ const signin = async (login, password) => {
     return res
   }
 
-  localStorage.setItem('currentUser', JSON.stringify(res))
-
   store.dispatch({ type: ACTION_TYPES.REFRESH_TOKEN, payload: res.payload })
 
   return res
@@ -99,7 +97,6 @@ export class SignInPage extends Component {
     userOptionsContainer.classList.add('todos__user-options-container')
     signUpElement.addEventListener('click', (event) => {
       event.preventDefault()
-      // В пейлоду передать юзернейм и пароль
       store.dispatch({ type: ACTION_TYPES.REDIRECT_SIGN_UP, payload: {} })
     })
 

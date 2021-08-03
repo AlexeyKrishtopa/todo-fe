@@ -2,7 +2,6 @@ import './style.scss'
 import Component from '../../utils/Component'
 import GooseJpg from '../../img/goose.jpg'
 import callApi from '../../utils/callApi'
-import store from '../../utils/Store'
 
 export class ProfileModal extends Component {
   constructor(options) {
@@ -25,9 +24,37 @@ export class ProfileModal extends Component {
     const imgElement = document.createElement('img')
     imgElement.classList.add('modal__img')
     imgElement.src = GooseJpg
-    const uploadImgButtonElement = document.createElement('button')
+    const uploadImgButtonElement = document.createElement('label')
+    const uploadImgInputElement = document.createElement('input')
+    uploadImgInputElement.type = 'file'
+    uploadImgInputElement.classList.add('modal__img-upload-input')
     uploadImgButtonElement.innerText = 'Upload image'
     uploadImgButtonElement.classList.add('modal__img-upload-button')
+    uploadImgButtonElement.append(uploadImgInputElement)
+
+    uploadImgInputElement.addEventListener('change', function (event) {
+      const fileImg = uploadImgInputElement.files[0]
+
+      let fReader = new FileReader()
+
+      fReader.onload = function () {
+        const imgSrc = fReader.result
+
+        imgElement.src = imgSrc
+
+        console.log(imgSrc)
+      }
+      fReader.readAsDataURL(fileImg)
+      
+      //   const fData = new FormData()
+      //   fData.append('fileImg', fileImg, 'img.jpg')
+
+      //   console.log(fReader)
+      //   console.log(fileImg)
+      //   console.log(fData)
+      //   console.log(fileImg.size > 2 * 1024 * 1024)
+      //   console.log(fileImg.name)
+    })
 
     imgContainerElement.append(imgElement)
     imgContainerElement.append(uploadImgButtonElement)
@@ -43,7 +70,6 @@ export class ProfileModal extends Component {
     userFirstNameLabelElement.classList.add('modal__user-first-name-label')
     const userFirstNameElement = document.createElement('div')
     userFirstNameElement.classList.add('modal__user-first-name')
-    // this.profileFirstName =
     userFirstNameElement.innerText = this.firstName
     userFirstNameItemElement.append(userFirstNameLabelElement)
     userFirstNameItemElement.append(userFirstNameElement)
@@ -144,9 +170,6 @@ export class ProfileModal extends Component {
 
             await callApi('/user', {
               method: 'PUT',
-              headers: {
-                Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-              },
               body: JSON.stringify(body),
             })
             if (event.currentTarget) {
@@ -169,9 +192,6 @@ export class ProfileModal extends Component {
 
                 await callApi('/user', {
                   method: 'PUT',
-                  headers: {
-                    Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-                  },
                   body: JSON.stringify(body),
                 })
 
@@ -199,8 +219,15 @@ export class ProfileModal extends Component {
 
     modalContainerElement.addEventListener('click', (event) => {
       if (!event.target.closest('.modal__profile-body')) {
-        event.currentTarget.remove()
-        document.body.classList.remove('locked')
+        modalBodyElement.style.opacity = '0%'
+        modalBodyElement.style.top = '-200%'
+        modalContainerElement.style.background = 'transparent'
+
+        const modalForRemove = event.currentTarget
+        modalContainerElement.addEventListener('transitionend', () => {
+          modalForRemove.remove()
+          document.body.classList.remove('locked')
+        })
       }
     })
     window.addEventListener('keydown', (event) => {
@@ -211,8 +238,14 @@ export class ProfileModal extends Component {
       ) {
         event.preventDefault
         if (event.key === 'Escape') {
-          modalContainerElement.remove()
-          document.body.classList.remove('locked')
+          modalBodyElement.style.opacity = '0%'
+          modalBodyElement.style.top = '-200%'
+          modalContainerElement.style.background = 'transparent'
+
+          modalContainerElement.addEventListener('transitionend', () => {
+            modalContainerElement.remove()
+            document.body.classList.remove('locked')
+          })
         }
       }
     })

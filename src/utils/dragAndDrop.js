@@ -83,9 +83,6 @@ export const dragAndDrop = () => {
 
       await callApi(`/todos/${activeTodo._id}`, {
         method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-        },
         body: JSON.stringify({
           description: activeTodo.description,
           completed: activeTodo.completed,
@@ -110,9 +107,6 @@ export const dragAndDrop = () => {
 
       await callApi(`/todos/${activeTodo._id}`, {
         method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-        },
         body: JSON.stringify({
           description: activeTodo.description,
           completed: activeTodo.completed,

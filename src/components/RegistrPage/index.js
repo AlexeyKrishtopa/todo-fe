@@ -7,9 +7,6 @@ import callApi from '../../utils/callApi'
 const register = async (login, password) => {
   const res = await callApi('/users/register', {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-    },
     body: JSON.stringify({
       login,
       password,

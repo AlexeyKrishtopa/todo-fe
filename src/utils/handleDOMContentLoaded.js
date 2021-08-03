@@ -8,9 +8,6 @@ export async function handleDOMContentLoaded() {
   if (document.querySelector('.todos__list')) {
     const res = await callApi('/todos', {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${store.state.currentUser.accessToken}`,
-      },
     })
     const oldTodos = res.payload.list
     store.dispatch({
