@@ -5,7 +5,7 @@ import { ACTION_TYPES } from '../../constants/actionTypes'
 import callApi from '../../utils/callApi'
 
 const signin = async (login, password) => {
-  const res = await callApi('/users/signin', {
+  const res = await callApi('/user/signin', {
     method: 'POST',
     body: JSON.stringify({
       login,
@@ -13,7 +13,7 @@ const signin = async (login, password) => {
     }),
   })
 
-  if (+res.status === 404) {
+  if (res.status === 404) {
     return res
   }
 
@@ -52,10 +52,10 @@ export class SignInPage extends Component {
         passwordInputElement.value
       )
 
-      if (+res.status === 200) {
+      if (res.status === 200) {
         store.dispatch({ type: ACTION_TYPES.REDIRECT_TODOS, payload: {} })
       } else {
-        const errorMessage = res.message.split(':')[1].trim()
+        const errorMessage = res.message
         errorMessageElement.innerText = errorMessage
       }
     })

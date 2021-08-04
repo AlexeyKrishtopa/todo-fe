@@ -6,12 +6,13 @@ const callApi = async (url, options) => {
   let accessToken = null 
   let refreshToken = null
   const currentUser = JSON.parse(localStorage.getItem('currentUser'))
+  
   if(currentUser) {
     accessToken = currentUser.accessToken
     refreshToken = currentUser.refreshToken
   }
 
-  const res = await fetch('http://localhost:3000/api' + url, {
+  const res = await fetch('http://localhost:3001/api' + url, {
     ...options,
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -22,7 +23,7 @@ const callApi = async (url, options) => {
 
   if (json.statusCode === 401) {
     const newTokenPair = await fetch(
-      'http://localhost:3000/api/users/refresh-token',
+      'http://localhost:3001/api/user/refresh-token',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -33,20 +34,10 @@ const callApi = async (url, options) => {
 
     const newJson = await newTokenPair.json()
 
-    console.log(newJson)
-
     store.dispatch({
       type: ACTION_TYPES.REFRESH_TOKEN,
       payload: newJson.payload.refreshedTokens,
     })
-
-    // const newRes = await fetch('http://localhost:3000/api' + url, {
-    //   ...options,
-    //   headers: {
-    //     Authorization: `Bearer ${accessToken}`,
-    //   },
-    // })
-    // json = await newRes.json()
 
     json = callApi(url, options)
   }

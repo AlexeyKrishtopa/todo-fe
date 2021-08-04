@@ -11,6 +11,7 @@ export class ProfileModal extends Component {
     this.age = options.age
     this.phone = options.phone
     this.mail = options.mail
+    this.imgSrc = options.imgSrc
   }
 
   render() {
@@ -23,7 +24,7 @@ export class ProfileModal extends Component {
     imgContainerElement.classList.add('modal__img-container')
     const imgElement = document.createElement('img')
     imgElement.classList.add('modal__img')
-    imgElement.src = GooseJpg
+    imgElement.src = this.imgSrc || GooseJpg
     const uploadImgButtonElement = document.createElement('label')
     const uploadImgInputElement = document.createElement('input')
     uploadImgInputElement.type = 'file'
@@ -32,20 +33,27 @@ export class ProfileModal extends Component {
     uploadImgButtonElement.classList.add('modal__img-upload-button')
     uploadImgButtonElement.append(uploadImgInputElement)
 
-    uploadImgInputElement.addEventListener('change', function (event) {
+    uploadImgInputElement.addEventListener('change', function async() {
       const fileImg = uploadImgInputElement.files[0]
 
       let fReader = new FileReader()
 
-      fReader.onload = function () {
+      fReader.onload = async function () {
         const imgSrc = fReader.result
+
+        await callApi('/user', {
+          method: 'PUT',
+          body: JSON.stringify({
+            imgSrc,
+          }),
+        })
 
         imgElement.src = imgSrc
 
         console.log(imgSrc)
       }
       fReader.readAsDataURL(fileImg)
-      
+
       //   const fData = new FormData()
       //   fData.append('fileImg', fileImg, 'img.jpg')
 

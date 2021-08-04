@@ -5,7 +5,7 @@ import { ACTION_TYPES } from '../../constants/actionTypes'
 import callApi from '../../utils/callApi'
 
 const register = async (login, password) => {
-  const res = await callApi('/users/register', {
+  const res = await callApi('/user/signup', {
     method: 'POST',
     body: JSON.stringify({
       login,
@@ -50,7 +50,7 @@ export class RegistrPage extends Component {
       if (!res.message) {
         store.dispatch({ type: ACTION_TYPES.REDIRECT_SIGN_IN, payload: {} })
       } else {
-        const errorMessage = res.message.split(':')[1].trim()
+        const errorMessage = res.message
         errorMessageElement.innerText = errorMessage
       }
     })
