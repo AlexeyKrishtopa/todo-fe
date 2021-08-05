@@ -16,7 +16,11 @@ class Redirector {
       case PAGE_TYPES.TODOS_PAGE:
         this.root.innerHTML = ''
         this.root.append(new TodosPage().render())
-        history.pushState(null, '', '#')
+        console.log(location.hash)
+        if(location.hash === '#/signin') {
+          console.log("PRIVER")
+          history.pushState(null, '', '#')
+        }
         break
       case PAGE_TYPES.REGISTRATION_PAGE:
         this.root.innerHTML = ''

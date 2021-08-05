@@ -137,7 +137,6 @@ export class Store {
           todosState: TODOS_STATES.ALL,
           todos: action.payload,
         }
-        // console.log(this.state)
         emiter.emit({ eventName: ACTION_TYPES.RERENDER_TODOS_LIST, args: [] })
         break
       case ACTION_TYPES.REDIRECT_TODOS:
@@ -151,7 +150,6 @@ export class Store {
         redirector.redirect(PAGE_TYPES.REGISTRATION_PAGE)
         break
       case ACTION_TYPES.REFRESH_TOKEN:
-        console.log(action.payload)
         localStorage.setItem('currentUser', JSON.stringify(action.payload))
         break
       default:

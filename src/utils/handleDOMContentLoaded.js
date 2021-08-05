@@ -34,7 +34,6 @@ export async function handleDOMContentLoaded() {
 
 export function handleHistory() {
   window.addEventListener('popstate', () => {
-    console.log(location.hash)
     if (location.hash === '#/signup') {
       redirector.redirect(PAGE_TYPES.REGISTRATION_PAGE)
     } else {

@@ -6,12 +6,12 @@ import { ACTION_TYPES } from './constants/actionTypes'
 
 const currentUser = JSON.parse(localStorage.getItem('currentUser'))
 
-redirector.redirect(PAGE_TYPES.SIGNIN_PAGE)
-
 if (currentUser) {
   store.dispatch({
     type: ACTION_TYPES.REFRESH_TOKEN,
     payload: currentUser,
   })
   redirector.redirect(PAGE_TYPES.TODOS_PAGE)
+} else {
+  redirector.redirect(PAGE_TYPES.SIGNIN_PAGE)
 }
