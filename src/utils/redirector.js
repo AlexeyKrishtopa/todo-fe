@@ -18,7 +18,6 @@ class Redirector {
         this.root.append(new TodosPage().render())
         console.log(location.hash)
         if(location.hash === '#/signin') {
-          console.log("PRIVER")
           history.pushState(null, '', '#')
         }
         break
